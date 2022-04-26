@@ -32,8 +32,8 @@ namespace GOLGame
         }
         public int settHeight
         {
-            get { return (int)WidthUpDown.Value; }
-            set { WidthUpDown.Value = value; }
+            get { return (int)HeightUpDown.Value; }
+            set { HeightUpDown.Value = value; }
         }
 
         private void OKbutton_Click(object sender, EventArgs e)

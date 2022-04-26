@@ -233,7 +233,7 @@ namespace GOLGame
             // A Brush for filling living cells interiors (color)
             Brush cellBrush = new SolidBrush(cellColor);
             Brush backBrush = new SolidBrush(backColor);
-            Color hudColor = Color.FromArgb(20, 0, 0, 255);
+            Color hudColor = Color.FromArgb(100, 0, 0, 255);
             Brush hudbrush = new SolidBrush(hudColor);
 
             // String format for neighbor count
@@ -270,13 +270,16 @@ namespace GOLGame
 
                     // Fill the cell with a brush if alive
                     if (universe[(int)x, (int)y] == true)
+                    {
                         e.Graphics.FillRectangle(cellBrush, cellRect);
+                    }
                     else
-                        e.Graphics.FillRectangle(backBrush, cellRect);                    
+                    {
+                        e.Graphics.FillRectangle(backBrush, cellRect);
+                    }
 
                     // Rectangles
                     RectangleF rect = new RectangleF(cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
-                    Rectangle unirect = new Rectangle(universe.GetLength(0), universe.GetLength(1), graphicsPanel1.ClientSize.Width, graphicsPanel1.ClientSize.Height-20);
 
                     // change the grid to infinite or finite
                     int neighbors = 0;
@@ -302,26 +305,27 @@ namespace GOLGame
                         e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);                    
                     }
 
-                    // HUD
-                    if (hudDraw == true)
-                    {
-                        if (gridPatt == true)
-                        {
-                            e.Graphics.DrawString(
-                                "Generations: " + generations.ToString() + '\n' +
-                                //"Cell Count: " + numalive.ToString() + '\n' +
-                                "BoundaryType: " + "Tordial" + '\n' +
-                                "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
-                        }
-                        else
-                        {
-                            e.Graphics.DrawString(
-                                "Generations: " + generations.ToString() + '\n' +
-                                //"Cell Count: " + numalive.ToString() + '\n' +
-                                "BoundaryType: " + "Finite" + '\n' +
-                                "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
-                        }
-                    }
+                }
+            }
+            Rectangle unirect = new Rectangle(universe.GetLength(0), universe.GetLength(1), graphicsPanel1.ClientSize.Width, graphicsPanel1.ClientSize.Height-25);
+            // HUD
+            if (hudDraw == true)
+            {
+                if (gridPatt == true)
+                {
+                    e.Graphics.DrawString(
+                        "Generations: " + generations.ToString() + '\n' +
+                        //"Cell Count: " + numalive.ToString() + '\n' +
+                        "BoundaryType: " + "Tordial" + '\n' +
+                        "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
+                }
+                else
+                {
+                    e.Graphics.DrawString(
+                        "Generations: " + generations.ToString() + '\n' +
+                        //"Cell Count: " + numalive.ToString() + '\n' +
+                        "BoundaryType: " + "Finite" + '\n' +
+                        "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
                 }
             }
              
@@ -337,8 +341,8 @@ namespace GOLGame
             if (e.Button == MouseButtons.Left)
             {
                 // Calculate the width and height of each cell in pixels
-                float cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
-                float cellHeight = graphicsPanel1.ClientSize.Height / universe.GetLength(1);
+                float cellWidth = (float)graphicsPanel1.ClientSize.Width / universe.GetLength(0);
+                float cellHeight = (float)graphicsPanel1.ClientSize.Height / universe.GetLength(1);
 
                 // Calculate the cell that was clicked in
                 // CELL X = MOUSE X / CELL WIDTH
@@ -380,45 +384,6 @@ namespace GOLGame
         {
             NextGeneration();
         }
-
-        private void playtoolStripButton_Click(object sender, EventArgs e) // called when you click the play button
-        {
-            timer.Enabled = true;
-            playtoolStripButton.Enabled = false;
-            startToolStripMenuItem.Enabled = false;
-            pausetoolStripButton.Enabled = true;
-            pauseToolStripMenuItem.Enabled = true;
-            graphicsPanel1.Invalidate();
-        }
-        private void pausetoolStripButton_Click(object sender, EventArgs e) // called when you click the pause button
-        {
-            timer.Enabled = false;
-            playtoolStripButton.Enabled = true;
-            startToolStripMenuItem.Enabled = true;
-            pausetoolStripButton.Enabled = false;
-            pauseToolStripMenuItem.Enabled = false;
-            graphicsPanel1.Invalidate();
-        }
-        private void nexttoolStripButton_Click(object sender, EventArgs e) // called when you click the next button
-        {
-            NextGeneration();
-        }
-
-        private void toroidalToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the torodial tool strip menu item
-        {
-            gridPatt = true;
-            finiteToolStripMenuItem.Checked = false;
-            toroidalToolStripMenuItem.Checked = true;
-            graphicsPanel1.Invalidate();
-        }
-        private void finiteToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the finite tool strip menu item
-        {
-            gridPatt = false;
-            toroidalToolStripMenuItem.Checked = false;
-            finiteToolStripMenuItem.Checked = true;
-            graphicsPanel1.Invalidate();
-        }
-
         private void newToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the new tool strip menu item
         {
             ClearUniverse();
@@ -426,14 +391,20 @@ namespace GOLGame
             StatusStripUpdate();
             graphicsPanel1.Invalidate();
         }
-        private void newToolStripButton_Click(object sender, EventArgs e) // called when you click the new button
+        private void hUDToolStripMenuItem_Click(object sender, EventArgs e)// called when you click the HUD tool strip menu item
         {
-            ClearUniverse();
-            generations = 0;
-            StatusStripUpdate();
+            if (hudDraw == true)
+            {
+                hUDToolStripMenuItem.Checked = false;
+                hudDraw = false;
+            }
+            else
+            {
+                hUDToolStripMenuItem.Checked = true;
+                hudDraw = true;
+            }
             graphicsPanel1.Invalidate();
         }
-
         private void gridToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the grid tool strip menu item
         {
             if (gridDraw == true)
@@ -460,6 +431,50 @@ namespace GOLGame
                 neighborCountToolStripMenuItem.Checked = true;
                 neighborTog = true;
             }
+            graphicsPanel1.Invalidate();
+        }
+        private void toroidalToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the torodial tool strip menu item
+        {
+            gridPatt = true;
+            finiteToolStripMenuItem.Checked = false;
+            toroidalToolStripMenuItem.Checked = true;
+            graphicsPanel1.Invalidate();
+        }
+        private void finiteToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the finite tool strip menu item
+        {
+            gridPatt = false;
+            toroidalToolStripMenuItem.Checked = false;
+            finiteToolStripMenuItem.Checked = true;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void playtoolStripButton_Click(object sender, EventArgs e) // called when you click the play button
+        {
+            timer.Enabled = true;
+            playtoolStripButton.Enabled = false;
+            startToolStripMenuItem.Enabled = false;
+            pausetoolStripButton.Enabled = true;
+            pauseToolStripMenuItem.Enabled = true;
+            graphicsPanel1.Invalidate();
+        }
+        private void pausetoolStripButton_Click(object sender, EventArgs e) // called when you click the pause button
+        {
+            timer.Enabled = false;
+            playtoolStripButton.Enabled = true;
+            startToolStripMenuItem.Enabled = true;
+            pausetoolStripButton.Enabled = false;
+            pauseToolStripMenuItem.Enabled = false;
+            graphicsPanel1.Invalidate();
+        }
+        private void nexttoolStripButton_Click(object sender, EventArgs e) // called when you click the next button
+        {
+            NextGeneration();
+        }
+        private void newToolStripButton_Click(object sender, EventArgs e) // called when you click the new button
+        {
+            ClearUniverse();
+            generations = 0;
+            StatusStripUpdate();
             graphicsPanel1.Invalidate();
         }
 
@@ -551,26 +566,6 @@ namespace GOLGame
             graphicsPanel1.Invalidate();
         }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e) // called when the form closes
-        {
-            Properties.Settings.Default.Save();
-        }
-
-        private void hUDToolStripMenuItem_Click(object sender, EventArgs e)// called when you click the HUD tool strip menu item
-        {
-            if (hudDraw == true)
-            {
-                hUDToolStripMenuItem.Checked = false;
-                hudDraw = false;
-            }
-            else
-            {
-                hUDToolStripMenuItem.Checked = true;
-                hudDraw = true;
-            }
-            graphicsPanel1.Invalidate();
-        }
-
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SettingDialog setdlg = new SettingDialog();
@@ -586,12 +581,48 @@ namespace GOLGame
                 uniHeight = setdlg.settHeight;
 
                 universe = new bool[uniWidth, uniHeight];
-                SetUniverse();
+                //SetUniverse();
                 altverse = new bool[uniWidth, uniHeight];
-                CopyUniverse();
+                //CopyUniverse();
             }
             StatusStripUpdate();
             graphicsPanel1.Invalidate();
+        }
+
+        private void backColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog backcolordlg = new ColorDialog();
+            backcolordlg.Color = backColor;
+            if (DialogResult.OK == backcolordlg.ShowDialog())
+            {
+                BackColor = backcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+        private void cellColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog cellcolordlg = new ColorDialog();
+            cellcolordlg.Color = cellColor;
+            if (DialogResult.OK == cellcolordlg.ShowDialog())
+            {
+                cellColor = cellcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+        private void gridColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog gridcolordlg = new ColorDialog();
+            gridcolordlg.Color = gridColor;
+            if (DialogResult.OK == gridcolordlg.ShowDialog())
+            {
+                gridColor = gridcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e) // called when the form closes
+        {
+            Properties.Settings.Default.Save();
         }
     }
 }

@@ -23,7 +23,6 @@ namespace GOLGame
             get { return (int)numericUpDown1.Value; }
             set { numericUpDown1.Value = value; } 
         }
-        public string MyString { get; set; }
 
         private void button3_Click(object sender, EventArgs e)
         {

@@ -64,6 +64,7 @@
             // 
             // OKbutton
             // 
+            this.OKbutton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.OKbutton.Location = new System.Drawing.Point(8, 87);
             this.OKbutton.Name = "OKbutton";
             this.OKbutton.Size = new System.Drawing.Size(144, 23);
@@ -101,6 +102,7 @@
             // 
             // NObutton
             // 
+            this.NObutton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.NObutton.Location = new System.Drawing.Point(158, 85);
             this.NObutton.Name = "NObutton";
             this.NObutton.Size = new System.Drawing.Size(120, 23);
