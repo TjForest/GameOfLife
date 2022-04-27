@@ -267,19 +267,13 @@ namespace GOLGame
                     cellRect.Y = y * cellHeight;
                     cellRect.Width = cellWidth;
                     cellRect.Height = cellHeight;
+                    RectangleF rect = new RectangleF(cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
 
                     // Fill the cell with a brush if alive
-                    if (universe[(int)x, (int)y] == true)
-                    {
-                        e.Graphics.FillRectangle(cellBrush, cellRect);
-                    }
-                    else
-                    {
+                    if (universe[(int)x, (int)y] == true)                    
+                        e.Graphics.FillRectangle(cellBrush, cellRect);                   
+                    else                    
                         e.Graphics.FillRectangle(backBrush, cellRect);
-                    }
-
-                    // Rectangles
-                    RectangleF rect = new RectangleF(cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
 
                     // change the grid to infinite or finite
                     int neighbors = 0;
@@ -304,7 +298,6 @@ namespace GOLGame
                     {
                         e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);                    
                     }
-
                 }
             }
             Rectangle unirect = new Rectangle(universe.GetLength(0), universe.GetLength(1), graphicsPanel1.ClientSize.Width, graphicsPanel1.ClientSize.Height-25);
@@ -315,7 +308,7 @@ namespace GOLGame
                 {
                     e.Graphics.DrawString(
                         "Generations: " + generations.ToString() + '\n' +
-                        //"Cell Count: " + numalive.ToString() + '\n' +
+                        "Cell Count: " + numalive.ToString() + '\n' +
                         "BoundaryType: " + "Tordial" + '\n' +
                         "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
                 }
@@ -323,7 +316,7 @@ namespace GOLGame
                 {
                     e.Graphics.DrawString(
                         "Generations: " + generations.ToString() + '\n' +
-                        //"Cell Count: " + numalive.ToString() + '\n' +
+                        "Cell Count: " + numalive.ToString() + '\n' +
                         "BoundaryType: " + "Finite" + '\n' +
                         "Universe Size: Width=" + uniWidth + " Height=" + uniHeight, font, hudbrush, unirect, HudFormat);
                 }
@@ -595,7 +588,7 @@ namespace GOLGame
             backcolordlg.Color = backColor;
             if (DialogResult.OK == backcolordlg.ShowDialog())
             {
-                BackColor = backcolordlg.Color;
+                backColor = backcolordlg.Color;
             }
             graphicsPanel1.Invalidate();
         }
