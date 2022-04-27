@@ -44,23 +44,68 @@
             // IntervalUpDown
             // 
             this.IntervalUpDown.Location = new System.Drawing.Point(158, 7);
+            this.IntervalUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.IntervalUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.IntervalUpDown.Name = "IntervalUpDown";
             this.IntervalUpDown.Size = new System.Drawing.Size(120, 20);
             this.IntervalUpDown.TabIndex = 0;
+            this.IntervalUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // WidthUpDown
             // 
             this.WidthUpDown.Location = new System.Drawing.Point(158, 33);
+            this.WidthUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.WidthUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.WidthUpDown.Name = "WidthUpDown";
             this.WidthUpDown.Size = new System.Drawing.Size(120, 20);
             this.WidthUpDown.TabIndex = 1;
+            this.WidthUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // HeightUpDown
             // 
             this.HeightUpDown.Location = new System.Drawing.Point(158, 59);
+            this.HeightUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.HeightUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.HeightUpDown.Name = "HeightUpDown";
             this.HeightUpDown.Size = new System.Drawing.Size(120, 20);
             this.HeightUpDown.TabIndex = 2;
+            this.HeightUpDown.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // OKbutton
             // 

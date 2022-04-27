@@ -100,6 +100,7 @@ namespace GOLGame
             NextGeneration();
         }
 
+        // My functions
         private void ClearUniverse() // Empty the universe and the altverse
         {
             for (int x = 0; x < universe.GetLength(0); x++)
@@ -133,7 +134,62 @@ namespace GOLGame
                 }
             }
         }
+        public void RandomizeTime() // logic for randomizing with time
+        {
+            int newseed = (int)DateTime.Now.Ticks;
+            seed = newseed;
+            Random generator = new Random(seed);
+            for (int x = 0; x < universe.GetLength(0); x++)
+            {
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    int temp = generator.Next(0, 2);
+                    if (temp == 0)
+                    {
+                        altverse[x, y] = true;
+                    }
+                    else
+                        altverse[x, y] = false;                 
+                }
+            }
+        }
+        public void Randomize() // logic for randomizing without changing the seed
+        {
+            Random generator = new Random(seed);
+            for (int x = 0; x < universe.GetLength(0); x++)
+            {
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    int temp = generator.Next(0, 2);
+                    if (temp == 0)
+                    {
+                        altverse[x, y] = true;
+                    }
+                    else
+                        altverse[x, y] = false;
+                }
+            }
+        }
+        public void Randomize(int newseed) // logic for randomizing with a new seed
+        {
+            seed = newseed;
+            Random generator = new Random(seed);
+            for (int x = 0; x < universe.GetLength(0); x++)
+            {
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    int temp = generator.Next(0, 2);
+                    if (temp == 0)
+                    {
+                        altverse[x, y] = true;
+                    }
+                    else
+                        altverse[x, y] = false;
+                }
+            }
+        }
 
+        // Count Neighbor fuctions
         private int CountNeighborsFinite(int x, int y) // counts the neighbors as if the universe was finite
         {
             int count = 0;
@@ -219,6 +275,7 @@ namespace GOLGame
             return count;
         }
         
+        // Graphics functions
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e) // Paints the screen
         {
             // Calculate the width and height of each cell in pixels
@@ -352,6 +409,7 @@ namespace GOLGame
             }
         }
 
+        // Tool Strip Menu Items
         private void exitToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the exit tool strip menu item
         {
             this.Close();
@@ -441,7 +499,161 @@ namespace GOLGame
             finiteToolStripMenuItem.Checked = true;
             graphicsPanel1.Invalidate();
         }
+        private void openToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the open tool strip menu item
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*|Cells|*.cells";
+            dlg.FilterIndex = 2;
 
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(dlg.FileName);
+
+                // Create a couple variables to calculate the width and height of the data in the file.
+                int maxWidth = 0;
+                int maxHeight = 0;
+
+                // Iterate through the file once to get its size.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    // If the row NOT begins with '!', then increment Maxheight and get the maxWidth.
+                    if (!row.StartsWith("!"))
+                    {
+                        maxHeight++;
+                        maxWidth = row.Count();
+                    }
+                }
+                // Resize the current universe and scratchPad to the width and height of the file calculated above.
+                uniWidth = maxWidth;
+                uniHeight = maxHeight;
+                universe = new bool[uniWidth, uniWidth];
+                altverse = new bool[uniHeight, uniHeight];
+
+                // Reset the file pointer back to the beginning of the file.
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                int ypos = 0;
+
+                // Iterate through the file again, this time reading in the cells.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string newrow = reader.ReadLine();
+
+                    // If the row is not a comment then 
+                    if (!newrow.StartsWith("!")) // it is a row of cells and needs to be iterated through.
+                    {
+                        for (int xPos = 0; xPos < newrow.Length; xPos++)
+                        {
+                            // If row[xPos] is a 'O' (capital O) then set the corresponding cell in the universe to alive.
+                            if (newrow[xPos] == 'O')
+                            {
+                                universe[xPos, ypos] = true;
+                                altverse[xPos, ypos] = true;
+                            }
+
+                            // If row[xPos] is a '.' (period) then set the corresponding cell in the universe to dead.
+                            if (newrow[xPos] == '.')
+                            {
+                                universe[xPos, ypos] = false;
+                                altverse[xPos, ypos] = false;
+                            }
+                        }
+                        ypos++;
+                    }
+                }
+                graphicsPanel1.Invalidate();
+                // Close the file.
+                reader.Close();
+            }
+        }
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the save tool strip menu item
+        {
+            SaveFileDialog savedlg = new SaveFileDialog();
+            savedlg.Filter = "All Files|*.*|Cells|*.cells";
+            savedlg.FilterIndex = 2; savedlg.DefaultExt = "cells";
+
+            if (DialogResult.OK == savedlg.ShowDialog())
+            {
+                StreamWriter writer = new StreamWriter(savedlg.FileName);
+
+                // Write any comments you want to include first.
+                // Prefix all comment strings with an exclamation point.
+                // Use WriteLine to write the strings to the file. 
+                // It appends a CRLF for you.
+                writer.WriteLine("!This is a comment?");
+
+                // Iterate through the universe one row at a time.
+                for (int y = 0; y < uniHeight; y++)
+                {
+                    // Create a string to represent the current row.
+                    String currentRow = string.Empty;
+
+                    // Iterate through the current row one cell at a time.
+                    for (int x = 0; x < uniWidth; x++)
+                    {
+                        if (universe[x, y] == true) // If the universe[x,y] is alive then append 'O' (capital O) to the row string.                        
+                            currentRow += 'O';
+                        else // Else if the universe[x,y] is dead then append '.' (period) to the row string.                       
+                            currentRow += '.';
+                    }
+
+                    // Once the current row has been read through and the string constructed, then write it to the file using WriteLine.
+                    writer.WriteLine(currentRow);
+                }
+
+                // After all rows and columns have been written then close the file.
+                writer.Close();
+            }
+        }
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reset();
+            uniWidth = Properties.Settings.Default.uniWidth;
+            uniHeight = Properties.Settings.Default.uniHeight;
+            universe = new bool[uniWidth, uniHeight];
+            altverse = new bool[uniWidth, uniHeight];
+            gridPatt = Properties.Settings.Default.gridPatt;
+            gridDraw = Properties.Settings.Default.gridDraw;
+            hudDraw = Properties.Settings.Default.hudDraw;
+            neighborTog = Properties.Settings.Default.neighborTog;
+            timer.Enabled = false;
+            gridColor = Properties.Settings.Default.gridColor;
+            cellColor = Properties.Settings.Default.cellColor;
+            backColor = Properties.Settings.Default.backColor;
+            timeInterval = Properties.Settings.Default.TimeInterval;
+            numalive = 0;
+            generations = 0;
+            seed = Properties.Settings.Default.Seed;
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reload();
+            uniWidth = Properties.Settings.Default.uniWidth;
+            uniHeight = Properties.Settings.Default.uniHeight;
+            universe = new bool[uniWidth, uniHeight];
+            altverse = new bool[uniWidth, uniHeight];
+            gridPatt = Properties.Settings.Default.gridPatt;
+            gridDraw = Properties.Settings.Default.gridDraw;
+            hudDraw = Properties.Settings.Default.hudDraw;
+            neighborTog = Properties.Settings.Default.neighborTog;
+            timer.Enabled = false;
+            gridColor = Properties.Settings.Default.gridColor;
+            cellColor = Properties.Settings.Default.cellColor;
+            backColor = Properties.Settings.Default.backColor;
+            timeInterval = Properties.Settings.Default.TimeInterval;
+            numalive = 0;
+            generations = 0;
+            seed = Properties.Settings.Default.Seed;
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+
+        // Buttons
         private void playtoolStripButton_Click(object sender, EventArgs e) // called when you click the play button
         {
             timer.Enabled = true;
@@ -470,156 +682,8 @@ namespace GOLGame
             generations = 0;
             StatusStripUpdate();
             graphicsPanel1.Invalidate();
-        }
-
-        public void RandomizeTime() // logic for randomizing with time
-        {
-            int newseed = (int)DateTime.Now.Ticks;
-            seed = newseed;
-            Random generator = new Random(seed);
-            for (int x = 0; x < universe.GetLength(0); x++)
-            {
-                for (int y = 0; y < universe.GetLength(1); y++)
-                {
-                    int temp = generator.Next(0, 2);
-                    if (temp == 0)
-                    {
-                        altverse[x, y] = true;
-                    }
-                    else
-                        altverse[x, y] = false;                 
-                }
-            }
-        }
-        public void Randomize() // logic for randomizing without changing the seed
-        {
-            Random generator = new Random(seed);
-            for (int x = 0; x < universe.GetLength(0); x++)
-            {
-                for (int y = 0; y < universe.GetLength(1); y++)
-                {
-                    int temp = generator.Next(0, 2);
-                    if (temp == 0)
-                    {
-                        altverse[x, y] = true;
-                    }
-                    else
-                        altverse[x, y] = false;
-                }
-            }
-        }
-        public void Randomize(int newseed) // logic for randomizing with a new seed
-        {
-            seed = newseed;
-            Random generator = new Random(seed);
-            for (int x = 0; x < universe.GetLength(0); x++)
-            {
-                for (int y = 0; y < universe.GetLength(1); y++)
-                {
-                    int temp = generator.Next(0, 2);
-                    if (temp == 0)
-                    {
-                        altverse[x, y] = true;
-                    }
-                    else
-                        altverse[x, y] = false;
-                }
-            }
-        }
-
-        private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromtime tool strip menu item
-        {
-            RandomizeTime();
-            SetUniverse();
-            generations = 0;
-            StatusStripUpdate();
-            graphicsPanel1.Invalidate();
-        }
-        private void fromCurrentSeedToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromcurrentseed tool strip menu item
-        {
-            Randomize();
-            SetUniverse();
-            generations = 0;
-            StatusStripUpdate();
-            graphicsPanel1.Invalidate();
-        }
-        private void fromSeedToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromseed tool strip menu item
-        {
-            RandDialog dlg = new RandDialog(); // open the dialog
-
-            dlg.myInteger = seed; // set the properties
-
-            if (DialogResult.OK == dlg.ShowDialog()) // if it exisits, randomize the univese.
-            {
-                seed = dlg.myInteger;               
-                Randomize(seed);
-                SetUniverse();
-                generations = 0;
-            }
-            StatusStripUpdate();
-            graphicsPanel1.Invalidate();
-        }
-
-        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SettingDialog setdlg = new SettingDialog();
-
-            setdlg.Interval = timeInterval;
-            setdlg.settWidth = uniWidth;
-            setdlg.settHeight = uniHeight;
-
-            if (DialogResult.OK == setdlg.ShowDialog())
-            {
-                timeInterval = setdlg.Interval;
-                uniWidth = setdlg.settWidth;
-                uniHeight = setdlg.settHeight;
-
-                universe = new bool[uniWidth, uniHeight];
-                //SetUniverse();
-                altverse = new bool[uniWidth, uniHeight];
-                //CopyUniverse();
-            }
-            StatusStripUpdate();
-            graphicsPanel1.Invalidate();
-        }
-
-        private void backColorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ColorDialog backcolordlg = new ColorDialog();
-            backcolordlg.Color = backColor;
-            if (DialogResult.OK == backcolordlg.ShowDialog())
-            {
-                backColor = backcolordlg.Color;
-            }
-            graphicsPanel1.Invalidate();
-        }
-        private void cellColorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ColorDialog cellcolordlg = new ColorDialog();
-            cellcolordlg.Color = cellColor;
-            if (DialogResult.OK == cellcolordlg.ShowDialog())
-            {
-                cellColor = cellcolordlg.Color;
-            }
-            graphicsPanel1.Invalidate();
-        }
-        private void gridColorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ColorDialog gridcolordlg = new ColorDialog();
-            gridcolordlg.Color = gridColor;
-            if (DialogResult.OK == gridcolordlg.ShowDialog())
-            {
-                gridColor = gridcolordlg.Color;
-            }
-            graphicsPanel1.Invalidate();
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e) // called when the form closes
-        {
-            Properties.Settings.Default.Save();
-        }
-
-        private void saveToolStripButton_Click(object sender, EventArgs e)
+        }       
+        private void saveToolStripButton_Click(object sender, EventArgs e) // called when you click the save button
         {
             SaveFileDialog savedlg = new SaveFileDialog();
             savedlg.Filter = "All Files|*.*|Cells|*.cells";
@@ -658,7 +722,7 @@ namespace GOLGame
                 writer.Close();
             }
         }
-        private void openToolStripButton_Click(object sender, EventArgs e)
+        private void openToolStripButton_Click(object sender, EventArgs e) // called when you click the open button
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "All Files|*.*|Cells|*.cells";
@@ -723,10 +787,171 @@ namespace GOLGame
                         ypos++;
                     }                       
                 }
-                graphicsPanel1.Invalidate();
                 // Close the file.
                 reader.Close();                
+                graphicsPanel1.Invalidate();
             }
+        }
+
+        // Randomize Menu Item Fuctions
+        private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromtime tool strip menu item
+        {
+            RandomizeTime();
+            SetUniverse();
+            generations = 0;
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+        private void fromCurrentSeedToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromcurrentseed tool strip menu item
+        {
+            Randomize();
+            SetUniverse();
+            generations = 0;
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+
+        // Randomize Dialog box
+        private void fromSeedToolStripMenuItem_Click(object sender, EventArgs e) // called when you click the fromseed tool strip menu item
+        {
+            RandDialog dlg = new RandDialog(); // open the dialog
+
+            dlg.myInteger = seed; // set the properties
+
+            if (DialogResult.OK == dlg.ShowDialog()) // if it exisits, randomize the univese.
+            {
+                seed = dlg.myInteger;               
+                Randomize(seed);
+                SetUniverse();
+                generations = 0;
+            }
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+
+        // Options Dialoge box
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingDialog setdlg = new SettingDialog();
+
+            setdlg.Interval = timeInterval;
+            setdlg.settWidth = uniWidth;
+            setdlg.settHeight = uniHeight;
+            bool BigWidth;
+            bool BigHeight;
+
+            if (DialogResult.OK == setdlg.ShowDialog())
+            {
+                // set the timer interval
+                timeInterval = setdlg.Interval;
+                timer.Interval = timeInterval;
+
+                // CODE FOR KEEPING ANY CUREENTLY ALIVE CELLS DURING RESIZING PROCESS
+                // See if the resized universe is bigger or smaller so that we can stay within the proper ranges
+                if ((setdlg.settWidth > uniWidth) || (setdlg.settWidth == uniWidth))                
+                    BigWidth = true;               
+                else                
+                    BigWidth = false;                
+                if ((setdlg.settHeight > uniHeight) || (setdlg.settHeight == uniHeight))                
+                    BigHeight = true;                
+                else               
+                    BigHeight = false;
+
+                // Copy the universe to the scratchpad and make a new universe to the new sizes
+                CopyUniverse();
+                universe = new bool[setdlg.settWidth, setdlg.settHeight];
+
+                if (BigWidth && BigHeight) // if the universe is bigger, no need to redo any logic
+                {
+                    SetUniverse();
+                    altverse = new bool[setdlg.settWidth, setdlg.settHeight];
+                    CopyUniverse();
+                }
+                else if (BigWidth && !BigHeight) // if the univers's height is smaller
+                {
+                    for (int x = 0; x < uniWidth; x++)
+                    {
+                        for (int y = 0; y < setdlg.settHeight; y++)
+                        {
+                            universe[x, y] = altverse[x, y];
+                        }
+                    }
+                    altverse = new bool[setdlg.settWidth,setdlg.settHeight];
+                }
+                else if (!BigWidth && BigHeight) // if the univers's width is smaller
+                {
+                    for (int x = 0; x < setdlg.settWidth; x++)
+                    {
+                        for (int y = 0; y < uniHeight; y++)
+                        {
+                            universe[x, y] = altverse[x, y];
+                        }
+                    }
+                }
+                else // if the universe is smaller
+                {
+                    for (int x = 0; x < setdlg.settWidth; x++)
+                    {
+                        for (int y = 0; y < setdlg.settHeight; y++)
+                        {
+                            universe[x, y] = altverse[x, y];
+                        }
+                    }
+                }
+                uniWidth = setdlg.settWidth;
+                uniHeight = setdlg.settHeight;
+            }
+            StatusStripUpdate();
+            graphicsPanel1.Invalidate();
+        }
+
+        // Color Dailoge boxes
+        private void backColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog backcolordlg = new ColorDialog();
+            backcolordlg.Color = backColor;
+            if (DialogResult.OK == backcolordlg.ShowDialog())
+            {
+                backColor = backcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+        private void cellColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog cellcolordlg = new ColorDialog();
+            cellcolordlg.Color = cellColor;
+            if (DialogResult.OK == cellcolordlg.ShowDialog())
+            {
+                cellColor = cellcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+        private void gridColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog gridcolordlg = new ColorDialog();
+            gridcolordlg.Color = gridColor;
+            if (DialogResult.OK == gridcolordlg.ShowDialog())
+            {
+                gridColor = gridcolordlg.Color;
+            }
+            graphicsPanel1.Invalidate();
+        }
+
+        // Closing the form
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e) // called when the form closes
+        {
+            Properties.Settings.Default.Seed = seed;
+            Properties.Settings.Default.gridDraw = gridDraw;
+            Properties.Settings.Default.gridPatt = gridPatt;
+            Properties.Settings.Default.neighborTog = neighborTog;
+            Properties.Settings.Default.uniWidth = uniWidth;
+            Properties.Settings.Default.uniHeight = uniHeight;
+            Properties.Settings.Default.gridColor = gridColor;
+            Properties.Settings.Default.cellColor = cellColor;
+            Properties.Settings.Default.backColor = backColor;
+            Properties.Settings.Default.TimeInterval = timeInterval;
+            Properties.Settings.Default.hudDraw = hudDraw;
+            Properties.Settings.Default.Save();
         }
     }
 }
