@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace GOLGame
 {
@@ -617,5 +618,47 @@ namespace GOLGame
         {
             Properties.Settings.Default.Save();
         }
+
+        private void saveToolStripButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog savedlg = new SaveFileDialog();
+            savedlg.Filter = "All Files|*.*|Cells|*.cells";
+            savedlg.FilterIndex = 2; savedlg.DefaultExt = "cells";
+            
+            if (DialogResult.OK == savedlg.ShowDialog())
+            {
+                StreamWriter writer = new StreamWriter(savedlg.FileName);
+            
+                // Write any comments you want to include first.
+                // Prefix all comment strings with an exclamation point.
+                // Use WriteLine to write the strings to the file. 
+                // It appends a CRLF for you.
+                writer.WriteLine("!This is a comment?");
+            
+                // Iterate through the universe one row at a time.
+                for (int y = 0; y < uniHeight; y++)
+                {
+                    // Create a string to represent the current row.
+                    String currentRow = string.Empty;
+            
+                    // Iterate through the current row one cell at a time.
+                    for (int x = 0; x < uniWidth; x++)
+                    {                      
+                        if(universe[x,y] == true) // If the universe[x,y] is alive then append 'O' (capital O) to the row string.                        
+                            currentRow += 'O';                       
+                        else // Else if the universe[x,y] is dead then append '.' (period) to the row string.                       
+                            currentRow += '.';                       
+                    }
+            
+                    // Once the current row has been read through and the string constructed, then write it to the file using WriteLine.
+                    writer.WriteLine(currentRow);
+                }
+            
+                // After all rows and columns have been written then close the file.
+                writer.Close();
+            }
+        }
+
+        private void openToolStripButton_Click(object sender, EventArgs e);
     }
 }
