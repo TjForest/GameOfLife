@@ -658,7 +658,75 @@ namespace GOLGame
                 writer.Close();
             }
         }
+        private void openToolStripButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*|Cells|*.cells";
+            dlg.FilterIndex = 2;
 
-        private void openToolStripButton_Click(object sender, EventArgs e);
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(dlg.FileName);
+
+                // Create a couple variables to calculate the width and height of the data in the file.
+                int maxWidth = 0;
+                int maxHeight = 0;
+
+                // Iterate through the file once to get its size.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    // If the row NOT begins with '!', then increment Maxheight and get the maxWidth.
+                    if (!row.StartsWith("!"))
+                    {
+                        maxHeight++;
+                        maxWidth = row.Count();
+                    }
+                }
+                // Resize the current universe and scratchPad to the width and height of the file calculated above.
+                uniWidth = maxWidth;
+                uniHeight = maxHeight;
+                universe = new bool[uniWidth, uniWidth];
+                altverse = new bool[uniHeight, uniHeight];
+
+                // Reset the file pointer back to the beginning of the file.
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                int ypos = 0;
+
+                // Iterate through the file again, this time reading in the cells.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string newrow = reader.ReadLine();
+
+                    // If the row is not a comment then 
+                    if (!newrow.StartsWith("!")) // it is a row of cells and needs to be iterated through.
+                    {
+                        for (int xPos = 0; xPos < newrow.Length; xPos++)
+                        {
+                            // If row[xPos] is a 'O' (capital O) then set the corresponding cell in the universe to alive.
+                            if (newrow[xPos] == 'O')
+                            {
+                                universe[xPos,ypos] = true;
+                                altverse[xPos,ypos] = true;
+                            }
+
+                            // If row[xPos] is a '.' (period) then set the corresponding cell in the universe to dead.
+                            if (newrow[xPos] == '.')
+                            {
+                                universe[xPos,ypos] = false;
+                                altverse[xPos,ypos] = false;
+                            }
+                        }
+                        ypos++;
+                    }                       
+                }
+                graphicsPanel1.Invalidate();
+                // Close the file.
+                reader.Close();                
+            }
+        }
     }
 }
