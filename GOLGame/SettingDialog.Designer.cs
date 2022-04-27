@@ -110,7 +110,7 @@
             // OKbutton
             // 
             this.OKbutton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OKbutton.Location = new System.Drawing.Point(8, 87);
+            this.OKbutton.Location = new System.Drawing.Point(8, 85);
             this.OKbutton.Name = "OKbutton";
             this.OKbutton.Size = new System.Drawing.Size(144, 23);
             this.OKbutton.TabIndex = 3;
@@ -159,7 +159,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(291, 120);
+            this.ClientSize = new System.Drawing.Size(291, 119);
             this.Controls.Add(this.NObutton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);

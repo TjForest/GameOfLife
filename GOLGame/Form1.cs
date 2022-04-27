@@ -161,10 +161,8 @@ namespace GOLGame
                 for (int y = 0; y < universe.GetLength(1); y++)
                 {
                     int temp = generator.Next(0, 2);
-                    if (temp == 0)
-                    {
+                    if (temp == 0)                 
                         altverse[x, y] = true;
-                    }
                     else
                         altverse[x, y] = false;
                 }
@@ -358,7 +356,7 @@ namespace GOLGame
                     }
                 }
             }
-            Rectangle unirect = new Rectangle(universe.GetLength(0), universe.GetLength(1), graphicsPanel1.ClientSize.Width, graphicsPanel1.ClientSize.Height-25);
+            RectangleF unirect = new RectangleF(universe.GetLength(0), universe.GetLength(1), (float)graphicsPanel1.ClientSize.Width, (float)graphicsPanel1.ClientSize.Height);
             // HUD
             if (hudDraw == true)
             {
@@ -757,6 +755,7 @@ namespace GOLGame
 
                 // Reset the file pointer back to the beginning of the file.
                 reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                // y stuff
                 int ypos = 0;
 
                 // Iterate through the file again, this time reading in the cells.
@@ -852,7 +851,7 @@ namespace GOLGame
                     BigWidth = true;               
                 else                
                     BigWidth = false;                
-                if ((setdlg.settHeight > uniHeight) || (setdlg.settHeight == uniHeight))                
+                if ((setdlg.settHeight > uniHeight) || (setdlg.settHeight == uniHeight)) 
                     BigHeight = true;                
                 else               
                     BigHeight = false;
@@ -865,7 +864,6 @@ namespace GOLGame
                 {
                     SetUniverse();
                     altverse = new bool[setdlg.settWidth, setdlg.settHeight];
-                    CopyUniverse();
                 }
                 else if (BigWidth && !BigHeight) // if the univers's height is smaller
                 {
@@ -887,6 +885,7 @@ namespace GOLGame
                             universe[x, y] = altverse[x, y];
                         }
                     }
+                    altverse = new bool[setdlg.settWidth, setdlg.settHeight];
                 }
                 else // if the universe is smaller
                 {
@@ -897,7 +896,9 @@ namespace GOLGame
                             universe[x, y] = altverse[x, y];
                         }
                     }
+                    altverse = new bool[setdlg.settWidth, setdlg.settHeight];
                 }
+                CopyUniverse();
                 uniWidth = setdlg.settWidth;
                 uniHeight = setdlg.settHeight;
             }
